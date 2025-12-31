@@ -226,8 +226,272 @@
   </div>
 
   <script>
-    // SAME JAVASCRIPT AS BEFORE - just paste the full script from previous response
-    (function(){const qs=sel=>document.querySelector(sel),qsa=sel=>[...document.querySelectorAll(sel)];let currentEmployee=null;function showToast(msg,type='success'){const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;qs('#toastContainer').appendChild(t);setTimeout(()=>t.remove(),4e3)}function navigateTo(url){window.location.href=url}function generateRandomNumber(){return(1e5+900000*Math.random()).toString()}function loadEmployee(){const u=new URLSearchParams(location.search),id=u.get('userId')||'EMP010';try{const e=JSON.parse(localStorage.getItem('employees')||'[]');currentEmployee=e.find(e=>e.id===id||e.employeeId===id);if(!currentEmployee){showToast('Employee not found','error');setTimeout(()=>navigateTo('../currentUserId.html'),1500);return}populateForm();qs('#loadingOverlay').style.display='none'}catch(e){showToast('Error loading data','error');qs('#loadingOverlay').style.display='none'}}function populateForm(){const e=currentEmployee;qs('#profileAvatar').textContent=e.fullName.slice(0,2).toUpperCase();qs('#profileName').textContent=e.fullName;qs('#profileId').textContent=e.employeeId;qs('#fullName').value=e.fullName;qs('#employeeId').value=e.employeeId;if(e.primaryContact){const[c,n]=e.primaryContact.split('-');qs('#primaryCountryCode').value=c||'+971';qs('#primaryNumber').value=n||''}if(e.secondaryContact){const[c,n]=e.secondaryContact.split('-');qs('#secondaryCountryCode').value=c||'';qs('#secondaryNumber').value=n||''}qs('#role').value=e.role||'';updateCheckboxes();qs('#entryPage').value=e.entryPage||'';qs('#designation').value=e.designation||'';qs('#employeeType').value=e.employeeType||'';if(e.company)qs('#company').value=e.company;toggleRoleAuthorizations();toggleDesignationOther();toggleCompanySection();updateEntryPageOptions()}function updateCheckboxes(){qsa('input[type="checkbox"]').forEach(c=>c.checked=!1);(currentEmployee.authorizations||[]).forEach(v=>{const c=qs(`input[value="${v}"]`);c&&(c.checked=!0)});(currentEmployee.reports||[]).forEach(v=>{const c=qs(`input[value="${v}"]`);c&&(c.checked=!0)})}document.addEventListener('DOMContentLoaded',()=>{attachEvents();loadEmployee()});function attachEvents(){qs('#resetPassword').addEventListener('change',function(){const s=qs('#newPasswordSection');if(this.checked){const r=generateRandomNumber(),p=`${r}_${currentEmployee.employeeId}`;qs('#newPassword').value=p;s.style.display='block'}else s.style.display='none'});qs('#copyPasswordBtn').addEventListener('click',handleCopyPassword);qs('#employeeForm').addEventListener('submit',e=>{e.preventDefault();saveEmployee()});qs('#role').addEventListener('change',toggleRoleAuthorizations);qs('#designation').addEventListener('change',toggleDesignationOther);qs('#employeeType').addEventListener('change',toggleCompanySection);qs('#company').addEventListener('change',toggleCompanyOther);qs('#authorizationGrid').addEventListener('change',updateEntryPageOptions)}function handleCopyPassword(){navigator.clipboard.writeText(qs('#newPassword').value).then(()=>{const b=qs('#copyPasswordBtn');b.innerHTML='✅ Copied!';b.classList.add('copied');setTimeout(()=>{b.innerHTML='📋 Copy';b.classList.remove('copied')},5e3)})}function toggleRoleAuthorizations(){const r=qs('#role').value,m=['Manager','Advisor'];['Dashboard','Services','Services Overview','Approvals'].forEach(a=>{const c=qs(`input[value="${a}"]`);c.disabled=m.includes(r)})}function toggleDesignationOther(){qs('#designationOtherSection').classList.toggle('show',qs('#designation').value==='Other')}function toggleCompanySection(){const v=qs('#employeeType').value;qs('#companySection').classList.toggle('show',v==='Contract')}function toggleCompanyOther(){qs('#companyOtherSection').classList.toggle('show',qs('#company').value==='Other')}function updateEntryPageOptions(){const s=qs('#entryPage');s.innerHTML='<option value="">Select...</option>';qsa('#authorizationGrid input:checked').forEach(c=>{if(c.value!=='Approvals'){const o=document.createElement('option');o.value=o.textContent=c.value;s.appendChild(o)}})}function validateForm(){const req=['fullName','role','entryPage','designation','employeeType','primaryCountryCode','primaryNumber'],p=qs('#primaryNumber');if(p.value.length<9||p.value.length>15){showToast('Phone must be 9-15 digits','error');return!1}if(qs('#employeeType').value==='Contract'&&!qs('#company').value){showToast('Company required for Contract','error');return!1}if(qs('#designation').value==='Other'&&!qs('#designationOther').value.trim()){showToast('Designation required','error');return!1}if(qs('#company').value==='Other'&&!qs('#companyOther').value.trim()){showToast('Company required','error');return!1}return req.every(id=>qs(`#${id}`).value.trim())}function saveEmployee(){if(!validateForm())return;try{const e=JSON.parse(localStorage.getItem('employees')||'[]'),i=e.findIndex(e=>e.id===currentEmployee.id);e[i]={...currentEmployee,fullName:qs('#fullName').value.trim(),primaryContact:`${qs('#primaryCountryCode').value}-${qs('#primaryNumber').value}`,secondaryContact:qs('#secondaryCountryCode').value?`${qs('#secondaryCountryCode').value}-${qs('#secondaryNumber').value}`:'',role:qs('#role').value,authorizations:qsa('#authorizationGrid input:checked').map(c=>c.value),reports:qsa('input[value*="Report"]:checked').map(c=>c.value),entryPage:qs('#entryPage').value,designation:qs('#designation').value==='Other'?qs('#designationOther').value.trim():qs('#designation').value,employeeType:qs('#employeeType').value,company:qs('#company').value==='Other'?qs('#companyOther').value.trim():qs('#company').value,...qs('#resetPassword').checked&&{password:qs('#newPassword').value}};localStorage.setItem('employees',JSON.stringify(e));showToast('Employee updated successfully');setTimeout(()=>navigateTo('../currentUserId.html'),1500)}catch(e){showToast('Save error','error')}}})();
+    // ✅ BUILT-IN TEST DATA - AUTOMATICALLY ADDED ON FIRST LOAD
+    if (!localStorage.getItem('employees')) {
+      localStorage.setItem('employees', JSON.stringify([ {
+    "id": "EMP010",
+    "fullName": "Jaya M",
+    "employeeId": "EMP010",
+    "password": "12345_EMP010",
+    "primaryContact": "+971-9876543210",
+    "secondaryContact": "+91-9876500010",
+    "role": "Technician",
+    "authorizations": ["Dashboard","Services","Employee Management"],
+    "reports": ["Vehicle Report"],
+    "entryPage": "Employee Management",
+    "designation": "Technician",
+    "employeeType": "Permanent",
+    "company": "ABC Motors"
+  },
+  {
+    "id": "EMP011",
+    "fullName": "Ahmed Khan",
+    "employeeId": "EMP011",
+    "password": "67890_EMP011",
+    "primaryContact": "+971-5566778899",
+    "secondaryContact": "+971-2233445566",
+    "role": "Supervisor",
+    "authorizations": ["Dashboard","Services Overview","Employee Management","Settings"],
+    "reports": ["Vehicle Report","Employee Report"],
+    "entryPage": "Employee Management",
+    "designation": "Supervisor",
+    "employeeType": "Permanent",
+    "company": "XYZ Auto"
+  },
+  {
+    "id": "EMP012",
+    "fullName": "Sarah Ali",
+    "employeeId": "EMP012",
+    "password": "11122_EMP012",
+    "primaryContact": "+91-9876543211",
+    "secondaryContact": "",
+    "role": "Manager",
+    "authorizations": ["Dashboard","Services","Services Overview","Approvals","Employee Management","Settings"],
+    "reports": ["Employee Report"],
+    "entryPage": "Dashboard",
+    "designation": "Foreman",
+    "employeeType": "Contract",
+    "company": "Premium Cars"
+  }]));
+    }
+
+    (function(){
+      const qs = sel => document.querySelector(sel);
+      const qsa = sel => [...document.querySelectorAll(sel)];
+      let currentEmployee = null;
+
+      function showToast(msg, type='success') {
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.textContent = msg;
+        qs('#toastContainer').appendChild(t);
+        setTimeout(() => t.remove(), 4000);
+      }
+
+      function navigateTo(url) {
+        window.location.href = url;
+      }
+
+      function generateRandomNumber() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+      }
+
+      function loadEmployee() {
+        const urlParams = new URLSearchParams(location.search);
+        const userId = urlParams.get('userId') || 'EMP010'; // Default to EMP010 if no userId
+        
+        try {
+          const employees = JSON.parse(localStorage.getItem('employees') || '[]');
+          currentEmployee = employees.find(emp => emp.id === userId || emp.employeeId === userId);
+          
+          if (!currentEmployee) {
+            showToast('Employee not found', 'error');
+            setTimeout(() => navigateTo('../currentUserId.html'), 1500);
+            return;
+          }
+
+          populateForm();
+        } catch (e) {
+          showToast('Error loading data', 'error');
+        } finally {
+          qs('#loadingOverlay').style.display = 'none';
+        }
+      }
+
+      function populateForm() {
+        const e = currentEmployee;
+        qs('#profileAvatar').textContent = e.fullName.slice(0,2).toUpperCase();
+        qs('#profileName').textContent = e.fullName;
+        qs('#profileId').textContent = e.employeeId;
+
+        qs('#fullName').value = e.fullName;
+        qs('#employeeId').value = e.employeeId;
+
+        if (e.primaryContact) {
+          const [country, number] = e.primaryContact.split('-');
+          qs('#primaryCountryCode').value = country || '+971';
+          qs('#primaryNumber').value = number || '';
+        }
+        if (e.secondaryContact) {
+          const [country, number] = e.secondaryContact.split('-');
+          qs('#secondaryCountryCode').value = country || '';
+          qs('#secondaryNumber').value = number || '';
+        }
+
+        qs('#role').value = e.role || '';
+        updateCheckboxes();
+        qs('#entryPage').value = e.entryPage || '';
+        qs('#designation').value = e.designation || '';
+        qs('#employeeType').value = e.employeeType || '';
+        if (e.company) qs('#company').value = e.company;
+
+        toggleRoleAuthorizations();
+        toggleDesignationOther();
+        toggleCompanySection();
+        updateEntryPageOptions();
+      }
+
+      function updateCheckboxes() {
+        qsa('input[type="checkbox"]').forEach(c => c.checked = false);
+        (currentEmployee.authorizations || []).forEach(v => {
+          const c = qs(`input[value="${v}"]`);
+          if (c) c.checked = true;
+        });
+        (currentEmployee.reports || []).forEach(v => {
+          const c = qs(`input[value="${v}"]`);
+          if (c) c.checked = true;
+        });
+      }
+
+      function attachEvents() {
+        qs('#resetPassword').addEventListener('change', function() {
+          const s = qs('#newPasswordSection');
+          if (this.checked) {
+            const r = generateRandomNumber();
+            const p = `${r}_${currentEmployee.employeeId}`;
+            qs('#newPassword').value = p;
+            s.style.display = 'block';
+          } else {
+            s.style.display = 'none';
+          }
+        });
+
+        qs('#copyPasswordBtn').addEventListener('click', handleCopyPassword);
+        qs('#employeeForm').addEventListener('submit', e => {
+          e.preventDefault();
+          saveEmployee();
+        });
+
+        qs('#role').addEventListener('change', toggleRoleAuthorizations);
+        qs('#designation').addEventListener('change', toggleDesignationOther);
+        qs('#employeeType').addEventListener('change', toggleCompanySection);
+        qs('#company').addEventListener('change', toggleCompanyOther);
+        qs('#authorizationGrid').addEventListener('change', updateEntryPageOptions);
+      }
+
+      function handleCopyPassword() {
+        navigator.clipboard.writeText(qs('#newPassword').value).then(() => {
+          const b = qs('#copyPasswordBtn');
+          b.innerHTML = '✅ Copied!';
+          b.classList.add('copied');
+          setTimeout(() => {
+            b.innerHTML = '📋 Copy';
+            b.classList.remove('copied');
+          }, 5000);
+        });
+      }
+
+      function toggleRoleAuthorizations() {
+        const r = qs('#role').value;
+        const m = ['Manager', 'Advisor'];
+        ['Dashboard','Services','Services Overview','Approvals'].forEach(a => {
+          const c = qs(`input[value="${a}"]`);
+          if (c) {
+            c.checked = m.includes(r);
+            c.disabled = m.includes(r);
+          }
+        });
+      }
+
+      function toggleDesignationOther() {
+        qs('#designationOtherSection').classList.toggle('show', qs('#designation').value === 'Other');
+      }
+
+      function toggleCompanySection() {
+        const v = qs('#employeeType').value;
+        qs('#companySection').classList.toggle('show', v === 'Contract');
+      }
+
+      function toggleCompanyOther() {
+        qs('#companyOtherSection').classList.toggle('show', qs('#company').value === 'Other');
+      }
+
+      function updateEntryPageOptions() {
+        const s = qs('#entryPage');
+        s.innerHTML = '<option value="">Select...</option>';
+        qsa('#authorizationGrid input:checked').forEach(c => {
+          if (c.value !== 'Approvals') {
+            const o = document.createElement('option');
+            o.value = o.textContent = c.value;
+            s.appendChild(o);
+          }
+        });
+      }
+
+      function validateForm() {
+        const req = ['fullName','role','entryPage','designation','employeeType','primaryCountryCode','primaryNumber'];
+        const p = qs('#primaryNumber');
+        if (p.value.length < 9 || p.value.length > 15) {
+          showToast('Phone must be 9-15 digits', 'error');
+          return false;
+        }
+        if (qs('#employeeType').value === 'Contract' && !qs('#company').value) {
+          showToast('Company required for Contract', 'error');
+          return false;
+        }
+        if (qs('#designation').value === 'Other' && !qs('#designationOther').value.trim()) {
+          showToast('Designation required', 'error');
+          return false;
+        }
+        if (qs('#company').value === 'Other' && !qs('#companyOther').value.trim()) {
+          showToast('Company required', 'error');
+          return false;
+        }
+        return req.every(id => qs(`#${id}`).value.trim());
+      }
+
+      function saveEmployee() {
+        if (!validateForm()) return;
+        try {
+          const e = JSON.parse(localStorage.getItem('employees') || '[]');
+          const i = e.findIndex(emp => emp.id === currentEmployee.id);
+          e[i] = {
+            ...currentEmployee,
+            fullName: qs('#fullName').value.trim(),
+            primaryContact: `${qs('#primaryCountryCode').value}-${qs('#primaryNumber').value}`,
+            secondaryContact: qs('#secondaryCountryCode').value ? `${qs('#secondaryCountryCode').value}-${qs('#secondaryNumber').value}` : '',
+            role: qs('#role').value,
+            authorizations: qsa('#authorizationGrid input:checked').map(c => c.value),
+            reports: qsa('input[value*="Report"]:checked').map(c => c.value),
+            entryPage: qs('#entryPage').value,
+            designation: qs('#designation').value === 'Other' ? qs('#designationOther').value.trim() : qs('#designation').value,
+            employeeType: qs('#employeeType').value,
+            company: qs('#company').value === 'Other' ? qs('#companyOther').value.trim() : qs('#company').value,
+            ...(qs('#resetPassword').checked && {password: qs('#newPassword').value})
+          };
+          localStorage.setItem('employees', JSON.stringify(e));
+          showToast('Employee updated successfully');
+          setTimeout(() => navigateTo('../currentUserId.html'), 1500);
+        } catch (e) {
+          showToast('Save error', 'error');
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        attachEvents();
+        loadEmployee();
+      });
+    })();
   </script>
 </body>
 </html>
